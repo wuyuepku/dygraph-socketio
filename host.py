@@ -19,9 +19,13 @@ def ws_disconnect():
     print('socketio %s disconnect at: %s' % (request.remote_addr, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
 
 def bkgtask():
+    counter = 0
     while True:
-        socketio.sleep(1)
-        socketio.emit('hello', "world", broadcast=True)
+        socketio.sleep(0.5)
+        socketio.emit('data', counter, broadcast=True)
+        counter = counter + 1
+        if counter > 6:
+            counter = 0
 socketio.start_background_task(bkgtask)
 
 if __name__=='__main__':

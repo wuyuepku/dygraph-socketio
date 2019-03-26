@@ -9,10 +9,20 @@
 	<link rel="stylesheet" href="/static/css/dygraph.min.css">
 	
 	<title>Dygraph-Socketio</title>
+
+	<style>
+	#dyg {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+	}
+	</style>
 </head>
 <body>
 	
-
+	<div id="dyg"></div>
 	
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/popper.min.js"></script>
@@ -23,7 +33,10 @@
 	
 	<script>
 	var socketio = null;  // 全局变量，websocket client对象
-	$(function() {  // 初始化通信部分
+	var dyg = null;  // 全局dygraph实例
+	var xydat = [[0,0],[1,1],[2,0]];
+	$(function() {  // 初始化
+		dyg = new Dygraph(document.getElementById("dyg"), xydat, {});
 		socketio = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/');
 		socketio.on('connect', function(socket) {
 			console.log('connected to server at ' + Date().toLocaleString());
@@ -31,8 +44,10 @@
 		socketio.on('disconnect', function(socket) {
 			console.log('disconnect from server at ' + Date().toLocaleString());
 		});
-		socketio.on('hello', function(world) {
-			console.log(world);
+		socketio.on('data', function(data) {
+			console.log(data);
+			xydat.push([xydat.length, data])
+			dyg.updateOptions( { 'file': xydat } );
 		});
 	});
 	</script>
